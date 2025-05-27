@@ -4,7 +4,7 @@ namespace App\Controllers\Api;
 
 use CodeIgniter\RESTful\ResourceController;
 
-class CategoryController extends ResourceController
+class AssetCategoryController extends ResourceController
 {
     protected $modelName = 'App\Models\AssetCategoryModel';
     protected $format    = 'json';
@@ -18,7 +18,7 @@ class CategoryController extends ResourceController
     {
         $category = $this->model->find($id);
         if ($category === null) {
-            return $this->failNotFound('Category not found');
+            return $this->failNotFound('Asset category not found');
         }
         return $this->respond($category);
     }
@@ -34,8 +34,12 @@ class CategoryController extends ResourceController
         }
         
         if ($this->model->insert($data)) {
-            return $this->respondCreated(['message' => 'Category created successfully', 'id' => $this->model->getInsertID()]);
+            return $this->respondCreated([
+                'message' => 'Asset category created successfully', 
+                'id' => $this->model->getInsertID()
+            ]);
         }
+        
         return $this->fail($this->model->errors());
     }
 
@@ -46,7 +50,7 @@ class CategoryController extends ResourceController
         // Check if category exists
         $category = $this->model->find($id);
         if ($category === null) {
-            return $this->failNotFound('Category not found');
+            return $this->failNotFound('Asset category not found');
         }
         
         // Validate category_name is unique (excluding current record)
@@ -58,8 +62,9 @@ class CategoryController extends ResourceController
         }
         
         if ($this->model->update($id, $data)) {
-            return $this->respond(['message' => 'Category updated successfully']);
+            return $this->respond(['message' => 'Asset category updated successfully']);
         }
+        
         return $this->fail($this->model->errors());
     }
 
@@ -68,7 +73,7 @@ class CategoryController extends ResourceController
         // Check if category exists
         $category = $this->model->find($id);
         if ($category === null) {
-            return $this->failNotFound('Category not found');
+            return $this->failNotFound('Asset category not found');
         }
         
         // Check if category is in use (RESTRICT)
@@ -79,8 +84,9 @@ class CategoryController extends ResourceController
         }
         
         if ($this->model->delete($id)) {
-            return $this->respondDeleted(['message' => 'Category deleted successfully']);
+            return $this->respondDeleted(['message' => 'Asset category deleted successfully']);
         }
-        return $this->fail('Failed to delete category');
+        
+        return $this->fail('Failed to delete asset category');
     }
 }

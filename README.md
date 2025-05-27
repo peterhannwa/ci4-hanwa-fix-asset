@@ -69,192 +69,239 @@ Additionally, make sure that the following extensions are enabled in your PHP:
 
 # Fixed Asset Management System
 
-## API Documentation
+A comprehensive API for managing fixed assets, including acquisition, depreciation, maintenance, transfers, conditions, and disposals.
 
-### Available Endpoints
+## API Endpoints
 
-1. Asset Management
-```javascript
-// Get all assets
-GET /api/assets
+### Asset Categories
 
-// Get single asset with related data
-GET /api/assets/{id}
+- `GET /api/categories` - List all categories
+- `GET /api/categories/{id}` - Get a specific category
+- `POST /api/categories` - Create a new category
+  ```json
+  {
+    "category_name": "IT Equipment",
+    "description": "Computer and related hardware"
+  }
+  ```
+- `PUT /api/categories/{id}` - Update a category
+- `DELETE /api/categories/{id}` - Delete a category
 
-// Create new asset
-POST /api/assets
-{
-    "unique_tag": "AST001",
-    "asset_name": "Dell Laptop XPS",
+### Suppliers
+
+- `GET /api/suppliers` - List all suppliers
+- `GET /api/suppliers/{id}` - Get a specific supplier
+- `POST /api/suppliers` - Create a new supplier
+  ```json
+  {
+    "supplier_name": "Dell Inc.",
+    "contact_person": "John Doe",
+    "phone_number": "123-456-7890",
+    "email": "contact@dell.com",
+    "address": "123 Tech Lane, Austin, TX"
+  }
+  ```
+- `PUT /api/suppliers/{id}` - Update a supplier
+- `DELETE /api/suppliers/{id}` - Delete a supplier
+
+### Depreciation Methods
+
+- `GET /api/depreciation-methods` - List all depreciation methods
+- `GET /api/depreciation-methods/{id}` - Get a specific method
+- `POST /api/depreciation-methods` - Create a new method
+  ```json
+  {
+    "method_name": "Custom Method",
+    "description": "A custom depreciation calculation method"
+  }
+  ```
+- `PUT /api/depreciation-methods/{id}` - Update a method
+- `DELETE /api/depreciation-methods/{id}` - Delete a method
+
+### Assets
+
+- `GET /api/assets` - List all assets (supports filtering by category_id, status, location)
+  - Optional query parameters:
+    - `category_id`: Filter by category
+    - `status`: Filter by status
+    - `location`: Filter by location
+- `GET /api/assets/{id}` - Get a specific asset with related data
+- `POST /api/assets` - Create a new asset
+  ```json
+  {
+    "unique_tag": "ASSET001",
+    "asset_name": "Dell XPS Laptop",
+    "description": "15-inch development laptop",
     "category_id": 1,
     "acquisition_date": "2023-01-01",
     "acquisition_cost": 1500.00,
     "supplier_id": 1,
-    "depreciation_method_id": 1,
+    "warranty_expiration_date": "2024-01-01",
     "useful_life_years": 5,
-    "salvage_value": 300.00
-}
-```
+    "salvage_value": 300.00,
+    "depreciation_method_id": 1,
+    "location": "Main Office",
+    "serial_number": "XPS15-123456",
+    "manufacturer": "Dell",
+    "purchase_order_number": "PO-2023-001"
+  }
+  ```
+- `PUT /api/assets/{id}` - Update an asset
+- `DELETE /api/assets/{id}` - Delete an asset
+- `POST /api/assets/{id}/depreciate` - Calculate next depreciation period
 
-2. Maintenance Records
-```javascript
-// Get maintenance history
-GET /api/maintenance/{asset_id}
+### Depreciation Schedules
 
-// Record maintenance
-POST /api/maintenance
-{
+- `GET /api/depreciation-schedules` - List all depreciation schedules
+- `GET /api/depreciation-schedules/asset/{asset_id}` - Get schedules for specific asset
+- `GET /api/depreciation-schedules/{id}` - Get a specific schedule entry
+- `POST /api/depreciation-schedules` - Create a schedule entry
+- `PUT /api/depreciation-schedules/{id}` - Update a schedule entry
+- `DELETE /api/depreciation-schedules/{id}` - Delete a schedule entry
+
+### Maintenance History
+
+- `GET /api/maintenance` - List all maintenance records
+- `GET /api/maintenance/asset/{asset_id}` - Get maintenance history for an asset
+- `GET /api/maintenance/{id}` - Get a specific maintenance record
+- `POST /api/maintenance` - Create a maintenance record
+  ```json
+  {
     "asset_id": 1,
-    "maintenance_date": "2023-12-01",
-    "description": "Regular maintenance",
-    "cost": 150.00,
-    "performed_by": "John Doe"
-}
-```
+    "maintenance_date": "2023-06-15",
+    "description": "Regular cleaning and hardware check",
+    "cost": 75.00,
+    "performed_by": "IT Support",
+    "next_due_date": "2023-12-15",
+    "update_status": true
+  }
+  ```
+- `PUT /api/maintenance/{id}` - Update a maintenance record
+- `DELETE /api/maintenance/{id}` - Delete a maintenance record
+- `PUT /api/maintenance/{id}/complete` - Complete maintenance and restore asset status
 
-3. Asset Transfers
-```javascript
-// Record transfer
-POST /api/transfers
-{
+### Asset Transfers
+
+- `GET /api/transfers` - List all transfer records
+- `GET /api/transfers/asset/{asset_id}` - Get transfer history for an asset
+- `GET /api/transfers/{id}` - Get a specific transfer record
+- `POST /api/transfers` - Record an asset transfer
+  ```json
+  {
     "asset_id": 1,
-    "transfer_date": "2023-12-01",
+    "transfer_date": "2023-07-10",
     "from_location": "Main Office",
     "to_location": "Branch Office",
-    "transferred_by": "Jane Smith"
-}
-```
+    "transferred_by": "Jane Smith",
+    "reason": "Department relocation"
+  }
+  ```
+- `PUT /api/transfers/{id}` - Update a transfer record
+- `DELETE /api/transfers/{id}` - Delete a transfer record
+- `PUT /api/transfers/{id}/complete` - Complete transfer process
 
-4. Asset Disposal
-```javascript
-// Record disposal
-POST /api/disposals
-{
+### Asset Disposals
+
+- `GET /api/disposals` - List all disposal records
+- `GET /api/disposals/asset/{asset_id}` - Get disposal history for an asset
+- `GET /api/disposals/{id}` - Get a specific disposal record
+- `POST /api/disposals` - Record an asset disposal
+  ```json
+  {
     "asset_id": 1,
     "disposal_date": "2023-12-01",
     "disposal_method": "Sold",
     "sale_price": 500.00,
+    "reason": "Obsolete technology",
     "disposed_by": "John Manager"
-}
+  }
+  ```
+- `PUT /api/disposals/{id}` - Update a disposal record
+- `DELETE /api/disposals/{id}` - Delete a disposal record
+
+### Asset Conditions
+
+- `GET /api/conditions` - List all condition assessments
+- `GET /api/conditions/asset/{asset_id}` - Get condition history for an asset
+- `GET /api/conditions/{id}` - Get a specific condition record
+- `POST /api/conditions` - Record an asset condition assessment
+  ```json
+  {
+    "asset_id": 1,
+    "assessment_date": "2023-05-20",
+    "condition_rating": "Good",
+    "notes": "Minor wear and tear but functioning well",
+    "assessed_by": "Maintenance Team"
+  }
+  ```
+- `PUT /api/conditions/{id}` - Update a condition record
+- `DELETE /api/conditions/{id}` - Delete a condition record
+
+### Reports
+
+- `GET /api/reports/asset-register` - Generate asset register report
+- `GET /api/reports/depreciation` - Generate depreciation report
+- `GET /api/reports/valuation` - Generate current valuation report
+- `GET /api/reports/maintenance-costs` - Generate maintenance costs report
+
+## Example API Usage
+
+```javascript
+// Get all assets
+const response = await fetch('http://localhost:2311/api/assets');
+const assets = await response.json();
+
+// Create a new asset
+const newAsset = {
+    unique_tag: "LAPTOP001",
+    asset_name: "Dell XPS 15",
+    category_id: 1,
+    acquisition_date: "2023-01-01",
+    acquisition_cost: 1500.00,
+    useful_life_years: 5,
+    depreciation_method_id: 1
+};
+
+const createResponse = await fetch('http://localhost:2311/api/assets', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(newAsset)
+});
 ```
-
-## Frontend Integration Example
-
-```typescript
-// Asset Service
-class AssetService {
-    private readonly baseUrl = 'http://localhost:2311/api';
-
-    async getAllAssets() {
-        const response = await fetch(`${this.baseUrl}/assets`);
-        return response.json();
-    }
-
-    async createAsset(assetData) {
-        const response = await fetch(`${this.baseUrl}/assets`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(assetData)
-        });
-        return response.json();
-    }
-
-    async recordMaintenance(maintenanceData) {
-        const response = await fetch(`${this.baseUrl}/maintenance`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(maintenanceData)
-        });
-        return response.json();
-    }
-
-    private getHeaders() {
-        return {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-        };
-    }
-}
-```
-
-## Error Handling
-
-The API returns standard HTTP status codes:
-- 200: Success
-- 201: Created
-- 400: Bad Request
-- 404: Not Found
-- 500: Server Error
 
 ## Running the Application
 
-1. Start the backend server:
+1. Start the server:
 ```bash
-cd d:\learn\codeigniter\ci4-hanwa-fix-asset
 php spark serve --port 2311
 ```
 
-2. Configure your frontend application to use the API endpoint:
-```javascript
-const API_BASE_URL = 'http://localhost:2311/api';
-```
-cd d:\learn\codeigniter\ci4-hanwa-fix-asset
-php spark serve --port 2311
-```
+2. Access the API at `http://localhost:2311/api/...`
 
-2. Configure your frontend application to use the API endpoint:
-```javascript
-const API_BASE_URL = 'http://localhost:2311/api';
-```
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+The system is now complete with all controllers, models, and routes properly configured according to the database schema.
 
-        return await response.json();
-    } catch (error) {
-        console.error('API call failed:', error);
-        throw error;
-    }
+## Error Handling
+
+The API returns appropriate HTTP status codes:
+
+- 200 - Success
+- 201 - Created
+- 400 - Bad Request (validation errors)
+- 404 - Not Found
+- 500 - Server Error
+
+Response format for errors:
+```json
+{
+  "status": 400,
+  "error": "Bad Request",
+  "messages": {
+    "field_name": "Error message"
+  }
 }
 ```
-
-## Testing the API
-
-You can use tools like Postman or curl to test the API endpoints:
-
-```bash
-# Get all assets
-curl -X GET http://localhost:2311/api/assets
-
-# Create new asset
-curl -X POST http://localhost:2311/api/assets \
-  -H "Content-Type: application/json" \
-  -d '{"unique_tag":"AST001","asset_name":"Dell Laptop",...}'
-```
-
-## Frontend Framework Recommendations
-
-1. React.js Setup:
-```bash
-npx create-react-app asset-management-frontend
-cd asset-management-frontend
-npm install axios @material-ui/core @material-ui/icons
-```
-
-2. Vue.js Setup:
-```bash
-npm init vue@latest asset-management-frontend
-cd asset-management-frontend
-npm install axios primevue
-```
-
-3. Angular Setup:
-```bash
-ng new asset-management-frontend
-cd asset-management-frontend
-ng add @angular/material
-npm install axios
+  }
+}
 ```
