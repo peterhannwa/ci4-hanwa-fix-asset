@@ -66,3 +66,195 @@ Additionally, make sure that the following extensions are enabled in your PHP:
 - json (enabled by default - don't turn it off)
 - [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
 - [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+
+# Fixed Asset Management System
+
+## API Documentation
+
+### Available Endpoints
+
+1. Asset Management
+```javascript
+// Get all assets
+GET /api/assets
+
+// Get single asset with related data
+GET /api/assets/{id}
+
+// Create new asset
+POST /api/assets
+{
+    "unique_tag": "AST001",
+    "asset_name": "Dell Laptop XPS",
+    "category_id": 1,
+    "acquisition_date": "2023-01-01",
+    "acquisition_cost": 1500.00,
+    "supplier_id": 1,
+    "depreciation_method_id": 1,
+    "useful_life_years": 5,
+    "salvage_value": 300.00
+}
+```
+
+2. Maintenance Records
+```javascript
+// Get maintenance history
+GET /api/maintenance/{asset_id}
+
+// Record maintenance
+POST /api/maintenance
+{
+    "asset_id": 1,
+    "maintenance_date": "2023-12-01",
+    "description": "Regular maintenance",
+    "cost": 150.00,
+    "performed_by": "John Doe"
+}
+```
+
+3. Asset Transfers
+```javascript
+// Record transfer
+POST /api/transfers
+{
+    "asset_id": 1,
+    "transfer_date": "2023-12-01",
+    "from_location": "Main Office",
+    "to_location": "Branch Office",
+    "transferred_by": "Jane Smith"
+}
+```
+
+4. Asset Disposal
+```javascript
+// Record disposal
+POST /api/disposals
+{
+    "asset_id": 1,
+    "disposal_date": "2023-12-01",
+    "disposal_method": "Sold",
+    "sale_price": 500.00,
+    "disposed_by": "John Manager"
+}
+```
+
+## Frontend Integration Example
+
+```typescript
+// Asset Service
+class AssetService {
+    private readonly baseUrl = 'http://localhost:2311/api';
+
+    async getAllAssets() {
+        const response = await fetch(`${this.baseUrl}/assets`);
+        return response.json();
+    }
+
+    async createAsset(assetData) {
+        const response = await fetch(`${this.baseUrl}/assets`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(assetData)
+        });
+        return response.json();
+    }
+
+    async recordMaintenance(maintenanceData) {
+        const response = await fetch(`${this.baseUrl}/maintenance`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(maintenanceData)
+        });
+        return response.json();
+    }
+
+    private getHeaders() {
+        return {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        };
+    }
+}
+```
+
+## Error Handling
+
+The API returns standard HTTP status codes:
+- 200: Success
+- 201: Created
+- 400: Bad Request
+- 404: Not Found
+- 500: Server Error
+
+## Running the Application
+
+1. Start the backend server:
+```bash
+cd d:\learn\codeigniter\ci4-hanwa-fix-asset
+php spark serve --port 2311
+```
+
+2. Configure your frontend application to use the API endpoint:
+```javascript
+const API_BASE_URL = 'http://localhost:2311/api';
+```
+cd d:\learn\codeigniter\ci4-hanwa-fix-asset
+php spark serve --port 2311
+```
+
+2. Configure your frontend application to use the API endpoint:
+```javascript
+const API_BASE_URL = 'http://localhost:2311/api';
+```
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('API call failed:', error);
+        throw error;
+    }
+}
+```
+
+## Testing the API
+
+You can use tools like Postman or curl to test the API endpoints:
+
+```bash
+# Get all assets
+curl -X GET http://localhost:2311/api/assets
+
+# Create new asset
+curl -X POST http://localhost:2311/api/assets \
+  -H "Content-Type: application/json" \
+  -d '{"unique_tag":"AST001","asset_name":"Dell Laptop",...}'
+```
+
+## Frontend Framework Recommendations
+
+1. React.js Setup:
+```bash
+npx create-react-app asset-management-frontend
+cd asset-management-frontend
+npm install axios @material-ui/core @material-ui/icons
+```
+
+2. Vue.js Setup:
+```bash
+npm init vue@latest asset-management-frontend
+cd asset-management-frontend
+npm install axios primevue
+```
+
+3. Angular Setup:
+```bash
+ng new asset-management-frontend
+cd asset-management-frontend
+ng add @angular/material
+npm install axios
+```

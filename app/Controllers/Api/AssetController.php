@@ -4,6 +4,7 @@ namespace App\Controllers\Api;
 
 use CodeIgniter\RESTful\ResourceController;
 use Exception;
+use App\Libraries\DepreciationCalculator;
 
 class AssetController extends ResourceController
 {
@@ -14,7 +15,15 @@ class AssetController extends ResourceController
     public function index()
     {
         try {
-            $assets = $this->model->findAll();
+            $assets = $this->model->select('assets.*, 
+                asset_categories.category_name,
+                suppliers.supplier_name,
+                depreciation_methods.method_name')
+                ->join('asset_categories', 'asset_categories.category_id = assets.category_id')
+                ->join('suppliers', 'suppliers.supplier_id = assets.supplier_id', 'left')
+                ->join('depreciation_methods', 'depreciation_methods.method_id = assets.depreciation_method_id')
+                ->findAll();
+            
             if (empty($assets)) {
                 return $this->respond([
                     'status' => 200,
@@ -39,6 +48,15 @@ class AssetController extends ResourceController
         if ($asset === null) {
             return $this->failNotFound('Asset not found');
         }
+
+        // Get related data
+        $asset['depreciation_schedule'] = model('DepreciationScheduleModel')
+            ->where('asset_id', $id)
+            ->findAll();
+        $asset['maintenance_history'] = model('MaintenanceHistoryModel')
+            ->where('asset_id', $id)
+            ->findAll();
+
         return $this->respond($asset);
     }
 
@@ -47,7 +65,16 @@ class AssetController extends ResourceController
     {
         $data = $this->request->getJSON();
         
+        // Calculate initial depreciation
+        $calculator = new DepreciationCalculator();
+        $data->current_value = $data->acquisition_cost;
+        
         if ($this->model->save($data)) {
+            $assetId = $this->model->getInsertID();
+            
+            // Create initial depreciation schedule
+            $this->calculateDepreciation($assetId);
+            
             return $this->respondCreated(['message' => 'Asset created successfully']);
         }
         
@@ -82,5 +109,24 @@ class AssetController extends ResourceController
         }
 
         return $this->fail('Failed to delete asset');
+    }
+
+    protected function calculateDepreciation($assetId)
+    {
+        $asset = $this->model->find($assetId);
+        $calculator = new DepreciationCalculator();
+        $schedule = $calculator->calculate(
+            $asset['acquisition_cost'],
+            $asset['salvage_value'],
+            $asset['useful_life_years'],
+            $asset['depreciation_method_id']
+        );
+
+        // Save depreciation schedule
+        $scheduleModel = model('DepreciationScheduleModel');
+        foreach ($schedule as $entry) {
+            $entry['asset_id'] = $assetId;
+            $scheduleModel->insert($entry);
+        }
     }
 }
