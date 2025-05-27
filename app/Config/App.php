@@ -16,7 +16,7 @@ class App extends BaseConfig
      *
      * E.g., http://example.com/
      */
-    public string $baseURL = 'http://localhost:8080/';
+    public string $baseURL = 'http://localhost:2311/';
 
     /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.
@@ -199,4 +199,24 @@ class App extends BaseConfig
      * @see http://www.w3.org/TR/CSP/
      */
     public bool $CSPEnabled = false;
+
+    /**
+     * --------------------------------------------------------------------------
+     * Environment
+     * --------------------------------------------------------------------------
+     *
+     * The environment the application is running in. This can be used to
+     * control various aspects of the application, such as error reporting,
+     * logging, and other environment-specific settings.
+     *
+     * Options include:
+     * - development
+     * - testing
+     * - production
+     *
+     * The default is 'production', but you can change this to 'development'
+     * or 'testing' to see more detailed error messages and enable other
+     * development features.
+     */
+    public string $environment = 'development';
 }

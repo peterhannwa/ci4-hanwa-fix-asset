@@ -3,7 +3,7 @@
 namespace App\Controllers\Api;
 
 use CodeIgniter\RESTful\ResourceController;
-use App\Models\AssetModel;
+use Exception;
 
 class AssetController extends ResourceController
 {
@@ -13,8 +13,23 @@ class AssetController extends ResourceController
     // GET /api/assets
     public function index()
     {
-        $assets = $this->model->findAll();
-        return $this->respond($assets);
+        try {
+            $assets = $this->model->findAll();
+            if (empty($assets)) {
+                return $this->respond([
+                    'status' => 200,
+                    'data' => [],
+                    'message' => 'No assets found'
+                ]);
+            }
+            return $this->respond([
+                'status' => 200,
+                'data' => $assets,
+                'message' => 'Assets retrieved successfully'
+            ]);
+        } catch (Exception $e) {
+            return $this->fail($e->getMessage());
+        }
     }
 
     // GET /api/assets/{id}
