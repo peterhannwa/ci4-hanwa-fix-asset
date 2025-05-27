@@ -301,7 +301,3 @@ Response format for errors:
     "field_name": "Error message"
   }
 }
-```
-  }
-}
-```
