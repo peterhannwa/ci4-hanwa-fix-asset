@@ -84,6 +84,11 @@ $routes->group('api', ['namespace' => 'App\Controllers\Api'], function($routes) 
     $routes->get('reports/depreciation', 'ReportController::depreciation');
     $routes->get('reports/valuation', 'ReportController::valuation');
     $routes->get('reports/maintenance-costs', 'ReportController::maintenanceCosts');
+    
+    // Handle OPTIONS requests for CORS
+    $routes->options('(:any)', function() {
+        return true;
+    });
 });
 
 // Default route
